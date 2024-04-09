@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { PrismaService } from 'src/libs/prisma/prisma.client';
 
 @Injectable()
 export class CustomerService {
-  create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+  constructor(private readonly prisma: PrismaService){}
+
+  create(payload: CreateCustomerDto) {
+    return this.prisma.customer.create({
+      data: {
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        vendorId: payload.vendorId,
+        userId: payload.userId,
+      }
+    })
   }
 
-  findAll() {
-    return `This action returns all customer`;
+  async findByUserIdOrThrow(userId: string) {
+    const foundCustomer = await this.prisma.customer.findFirst({where: {userId}})
+    if(!foundCustomer) {
+      throw new NotFoundException('Customer not found')
+    }
+    return foundCustomer;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  async findOrders(userId: string, page: number = 1, pageSize: number = 20) {
+    const foundCustomer = await this.findByUserIdOrThrow(userId)
+    const offset = (page - 1) * pageSize;
+    
+    return this.prisma.order.findMany({
+      where: {
+        customerId: foundCustomer.id,
+      },
+      take: pageSize,
+      skip: offset,
+    })
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
+  findAll(page: number = 1, pageSize: number = 20) {
+    const offset = (page - 1) * pageSize;
+    return this.prisma.customer.findMany({
+      take: pageSize,
+      skip: offset,
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  findOne(id: string) {
+    return this.prisma.customer.findFirst({where: {id}})
+  }
+
+  update(id: string, payload: UpdateCustomerDto) {
+    return this.prisma.customer.update({
+      where: {id},
+      data: payload,
+    })
+  }
+
+  remove(id: string) {
+    return this.prisma.customer.delete({where: {id}})
   }
 }
