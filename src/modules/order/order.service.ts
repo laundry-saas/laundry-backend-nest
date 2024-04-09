@@ -40,6 +40,7 @@ export class OrderService {
         customerId: payload.customerId,
         items: payload.items as unknown as Prisma.JsonArray,
         totalAmount,
+        vendorId: payload.vendorId,
       },
     });
   }

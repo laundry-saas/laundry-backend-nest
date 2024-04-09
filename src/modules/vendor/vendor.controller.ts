@@ -5,9 +5,10 @@ import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CurrentUser } from 'src/libs/commons/decorators/current-user.decorator';
 import { User } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags("Vendor")
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('vendor')
 export class VendorController {

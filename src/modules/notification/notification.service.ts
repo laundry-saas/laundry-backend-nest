@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { PrismaService } from 'src/libs/prisma/prisma.client';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class NotificationService {
@@ -10,9 +11,9 @@ export class NotificationService {
   create(payload: CreateNotificationDto) {
     return this.prisma.notification.create({
       data: {
-        title: '',
-        message: '',
-        userId: '',
+        ...payload,
+        meta: {},
+        type: NotificationType.GENERAL,
       },
     });
   }
@@ -30,17 +31,17 @@ export class NotificationService {
   }
 
   findOne(id: string) {
-    return this.prisma.notification.findFirst({where: {id}});
+    return this.prisma.notification.findFirst({ where: { id } });
   }
 
   update(id: string, updateNotificationDto: UpdateNotificationDto) {
     return this.prisma.notification.update({
-      where: {id},
+      where: { id },
       data: updateNotificationDto,
-    })
+    });
   }
 
   remove(id: string) {
-    return this.prisma.notification.delete({where: {id}});
+    return this.prisma.notification.delete({ where: { id } });
   }
 }

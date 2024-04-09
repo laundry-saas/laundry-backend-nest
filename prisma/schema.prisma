@@ -42,6 +42,13 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum NotificationType {
+  GENERAL
+  VENDOR
+  CUSTOMER
+  ADMIN
+}
+
 model Location {
   id      String @id @default(uuid())
   country String
@@ -84,17 +91,18 @@ model Vendor {
   name        String
   location    Location @relation(fields: [locationId], references: [id])
   locationId  String
-  contactInfo String
+  contactInfo Json?
 
   subscription Subscription?
   customers    Customer[]
-  services     Service[]
+  items        Item[]
 
   user      User      @relation(fields: [userId], references: [id])
   userId    String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Payment   Payment[]
+  orders    Order[]
 
   @@map("vendors")
 }
@@ -112,11 +120,12 @@ model Customer {
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  reviews   Review[]
 
   @@map("customers")
 }
 
-model Service {
+model Item {
   id          String   @id @default(uuid())
   name        String
   price       Float
@@ -127,42 +136,49 @@ model Service {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("services")
+  @@map("items")
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  items      Json[]
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  customerId String
-  status     OrderStatus
-  reviews    Review[]
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  items       Json[]
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  customerId  String
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  vendorId    String
+  totalAmount Float
+  status      OrderStatus
+  reviews     Review[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@map("orders")
 }
 
 model Review {
-  id        String   @id @default(uuid())
-  comment   String
-  rating    Int
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(uuid())
+  comment    String
+  rating     Int
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("reviews")
 }
 
 model Notification {
-  id        String   @id @default(uuid())
+  id        String           @id @default(uuid())
   title     String
   message   String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
   userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  type      NotificationType
+  meta      Json?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
   @@map("notifications")
 }
@@ -170,9 +186,9 @@ model Notification {
 model Subscription {
   id              String             @id @default(uuid())
   plan            Plan               @relation(fields: [planId], references: [id])
-  planId          String            
+  planId          String
   vendor          Vendor             @relation(fields: [vendorId], references: [id])
-  vendorId        String             @unique 
+  vendorId        String             @unique
   startDate       DateTime
   endDate         DateTime
   recurringAmount Float
@@ -202,9 +218,9 @@ model Payment {
   id       String @id @default(uuid())
   amount   Float
   plan     Plan   @relation(fields: [planId], references: [id])
-  planId   String 
+  planId   String
   vendor   Vendor @relation(fields: [vendorId], references: [id])
-  vendorId String 
+  vendorId String
 
   @@map("vendor_payments")
 }

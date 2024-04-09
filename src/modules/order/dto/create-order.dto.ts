@@ -20,6 +20,11 @@ export class CreateOrderDto {
     customerId: string;
 
     @ApiProperty()
+    @IsUUID()
+    @IsNotEmpty()
+    vendorId: string;
+
+    @ApiProperty()
     @IsEnum(OrderStatus)
     status: OrderStatus;
 
