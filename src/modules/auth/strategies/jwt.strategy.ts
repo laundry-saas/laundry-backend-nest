@@ -7,18 +7,22 @@ import { PrismaService } from 'src/libs/prisma/prisma.client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(config: ConfigService, private prisma: PrismaService) {
+  constructor(
+    config: ConfigService,
+    private prisma: PrismaService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: Config.JWT_SECRET
+      secretOrKey: Config.JWT_SECRET,
     });
   }
 
   async validate(payload: any) {
+    const userId = payload.sub;
     try {
       const user = await this.prisma.user.findFirst({
-        where: { email: payload?.email },
+        where: { id: userId },
       });
       delete user.password;
       return user;

@@ -5,8 +5,9 @@ import { PrismaService } from '../../libs/prisma/prisma.client';
 import { JwtModule } from '@nestjs/jwt';
 import { Config } from 'src/libs/configs/constants.config';
 import { JwtStrategy } from './strategies';
-import { ConfigService } from '@nestjs/config';
 import { UserModule } from 'src/modules/user/user.module';
+import { CustomerModule } from '../customer/customer.module';
+import { VendorModule } from '../vendor/vendor.module';
 
 @Module({
   imports: [
@@ -18,10 +19,11 @@ import { UserModule } from 'src/modules/user/user.module';
         },
       }),
     }),
-
     UserModule,
+    CustomerModule,
+    VendorModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, PrismaService],
 })
 export class AuthModule {}

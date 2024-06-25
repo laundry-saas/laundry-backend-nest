@@ -5,7 +5,7 @@ import {
   IsPhoneNumber,
   ValidateNested,
 } from 'class-validator';
-import {  Type } from 'class-transformer'
+import { Type } from 'class-transformer';
 
 export class VendorContactInfo {
   @ApiProperty()
@@ -27,10 +27,14 @@ export class CreateVendorDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  locationId: string;
+  country: string;
 
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => VendorContactInfo)
   contactInfo: VendorContactInfo;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  userId: string;
 }

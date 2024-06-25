@@ -5,6 +5,6 @@ import { PrismaService } from 'src/libs/prisma/prisma.client';
 
 @Module({
   controllers: [NotificationController],
-  providers: [NotificationService,PrismaService],
+  providers: [NotificationService, PrismaService],
 })
 export class NotificationModule {}

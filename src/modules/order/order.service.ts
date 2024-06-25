@@ -1,19 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto, CreateOrderItemDto } from './dto/create-order.dto';
+import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/libs/prisma/prisma.client';
-import { Prisma } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async validateCustomerPendingOrderWithVendor(
+    vendorId: string,
+    customerId: string,
+  ) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        vendorId,
+        customerId,
+        status: OrderStatus.PENDING,
+      },
+    });
+
+    if (order) {
+      throw new Error('You have a pending order with this vendor');
+    }
+  }
 
   async create(payload: CreateOrderDto) {
     let orderItems: { amount: number; itemId: string; quantity: number }[] = [];
 
     if (payload.items.length) {
       const tasks = payload.items.map(async (item) => {
-        const itemResult = await this.prisma.item.findFirst({
+        const itemResult = await this.prisma.priceList.findFirst({
           where: { id: item.itemId },
         });
 
@@ -41,6 +58,12 @@ export class OrderService {
         items: payload.items as unknown as Prisma.JsonArray,
         totalAmount,
         vendorId: payload.vendorId,
+        isExpress: payload.isExpress,
+        pickUpAddress: payload.pickUpAddress,
+        pickUpDateTime: payload.pickUpDateTime,
+        dropOffDateTime: payload.dropOffDateTime,
+        note: payload.note,
+        paymentMode: payload.paymentMode,
       },
     });
   }
@@ -54,7 +77,7 @@ export class OrderService {
 
     if (payload.items.length) {
       const tasks = payload.items.map(async (item) => {
-        const itemResult = await this.prisma.item.findFirst({
+        const itemResult = await this.prisma.priceList.findFirst({
           where: { id: item.itemId },
         });
 
@@ -79,7 +102,6 @@ export class OrderService {
       where: { id },
       data: {
         status: payload.status,
-        customerId: payload.customerId,
         items: payload.items as unknown as Prisma.JsonArray,
         totalAmount,
       },

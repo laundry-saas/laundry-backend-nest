@@ -13,5 +13,4 @@ export class CreateNotificationDto {
   @ApiProperty()
   @IsNotEmpty()
   userId: string;
-
 }

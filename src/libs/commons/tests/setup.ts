@@ -1,5 +1,5 @@
 import {
-    CanActivate,
+  CanActivate,
   ExecutionContext,
   INestApplication,
   Injectable,
@@ -10,11 +10,14 @@ import {
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.guard';
-import { generateSampleUser, generateSampleUserPayload } from 'src/modules/auth/tests/testSetup';
+import {
+  generateSampleUser,
+  generateSampleUserPayload,
+} from 'src/modules/auth/tests/testSetup';
 
 @Injectable()
 export class MockAuthGuard implements CanActivate {
-    private readonly mockUser: User;
+  private readonly mockUser: User;
 
   constructor(user: User) {
     this.mockUser = user || generateSampleUserPayload();
@@ -26,7 +29,7 @@ export class MockAuthGuard implements CanActivate {
     request.user = await generateSampleUser(this.mockUser);
     return true; // Always allow the request to pass through
   }
-} 
+}
 
 interface TestAppConfig {
   imports: any[];

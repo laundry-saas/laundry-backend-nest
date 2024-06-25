@@ -7,21 +7,22 @@ import { UserModule } from './modules/user/user.module';
 import { CustomerModule } from './modules/customer/customer.module';
 import { VendorModule } from './modules/vendor/vendor.module';
 import { OrderModule } from './modules/order/order.module';
-import { ItemModule } from './modules/item/item.module';
 import { ReviewModule } from './modules/review/review.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { PriceListModule } from './modules/price-list/price-list.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UserModule,
-    CustomerModule,
+    // CustomerModule,
     VendorModule,
-    OrderModule,
-    ItemModule,
-    ReviewModule,
-    NotificationModule
+    PriceListModule,
+    // OrderModule,
+    // ItemModule,
+    // ReviewModule,
+    // NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

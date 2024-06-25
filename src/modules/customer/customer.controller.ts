@@ -1,20 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CurrentUser } from 'src/libs/commons/decorators/current-user.decorator';
+import { UserEntity } from '../user/entities/user.entity';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
+@ApiTags('Customer')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  @Post()
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customerService.create(createCustomerDto);
-  }
-
   @Get()
-  findAll() {
-    return this.customerService.findAll();
+  async getOrders(@CurrentUser() user: UserEntity) {
+    const customer = await this.customerService.findCustomerByUserIdOrThrow(
+      user.id,
+    );
+    return this.customerService.findOrders(customer.id);
   }
-
 }
