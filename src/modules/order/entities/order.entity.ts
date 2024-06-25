@@ -3,6 +3,12 @@ import { $Enums, Order } from '@prisma/client';
 
 export class OrderEntity implements Order {
   @ApiProperty()
+  fullName: string;
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  phone: string;
+  @ApiProperty()
   id: string;
   @ApiProperty()
   items: any[];

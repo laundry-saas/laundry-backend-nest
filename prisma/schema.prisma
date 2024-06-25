@@ -121,10 +121,10 @@ model Customer {
   vendorId  String
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @unique
-  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   reviews   Review[]
+  orders    Order[]
 
   @@map("customers")
 }
@@ -144,23 +144,26 @@ model PriceList {
 }
 
 model Order {
-  id              String         @id @default(uuid())
+  id              String      @id @default(uuid())
   items           Json[]
-  customer        Customer       @relation(fields: [customerId], references: [id])
-  customerId      String
-  vendor          Vendor         @relation(fields: [vendorId], references: [id])
+  fullName        String
+  email           String
+  phone           String
+  customer        Customer?   @relation(fields: [customerId], references: [id])
+  customerId      String?
+  vendor          Vendor      @relation(fields: [vendorId], references: [id])
   vendorId        String
   totalAmount     Float
   note            String?
   pickUpAddress   String
   pickUpDateTime  DateTime
   dropOffDateTime DateTime
-  isExpress       Boolean        @default(false)
-  paymentMode     PaymentMode    @default(CASH)
+  isExpress       Boolean     @default(false)
+  paymentMode     PaymentMode @default(CASH)
   status          OrderStatus
   reviews         Review[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   @@map("orders")
 }

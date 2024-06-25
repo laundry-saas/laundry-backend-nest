@@ -26,8 +26,20 @@ export class CreateOrderItemDto {
 
 export class CreateOrderDto {
   @ApiProperty()
-  @IsUUID()
   @IsNotEmpty()
+  fullName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  phone: string;
+
+  @ApiProperty()
+  @IsUUID()
+  @IsOptional()
   customerId: string;
 
   @ApiProperty()

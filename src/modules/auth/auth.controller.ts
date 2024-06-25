@@ -31,7 +31,7 @@ export class AuthController {
       password,
       role: UserRole.CUSTOMER,
     });
-    await this.vendorService.findOneOrThrow(vendorId)
+    await this.vendorService.findOneOrThrow(vendorId);
     await this.customerService.create({
       email,
       phone,

@@ -13,10 +13,10 @@ export class OrderController {
 
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
-    await this.orderService.validateCustomerPendingOrderWithVendor(
-      createOrderDto.vendorId,
-      createOrderDto.customerId,
-    );
+    // await this.orderService.validateCustomerPendingOrderWithVendor(
+    //   createOrderDto.vendorId,
+    //   createOrderDto.customerId,
+    // );
     return this.orderService.create(createOrderDto);
   }
 }

@@ -10,7 +10,6 @@ export const generateSampleOrderPayload = (
 ) => {
   return {
     id: faker.string.uuid(),
-    customerId: faker.string.uuid(),
     vendorId: faker.string.uuid(),
     dropOffDateTime: faker.date.anytime(),
     pickUpDateTime: faker.date.anytime(),

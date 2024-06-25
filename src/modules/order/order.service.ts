@@ -53,8 +53,11 @@ export class OrderService {
 
     return this.prisma.order.create({
       data: {
+        fullName: payload.fullName,
+        email: payload.email,
+        phone: payload.phone,
         status: payload.status,
-        customerId: payload.customerId,
+        customerId: payload.customerId ?? null,
         items: payload.items as unknown as Prisma.JsonArray,
         totalAmount,
         vendorId: payload.vendorId,

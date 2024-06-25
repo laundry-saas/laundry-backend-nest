@@ -44,8 +44,8 @@ describe('PriceListController', () => {
 
   afterEach(async () => {
     await prisma.priceList.deleteMany();
-    await prisma.vendor.deleteMany();
-    await prisma.user.deleteMany();
+    await prisma.vendor.delete({ where: { id: vendorId } });
+    await prisma.user.delete({ where: { id: userId } });
   });
 
   describe('POST /price-list', () => {
