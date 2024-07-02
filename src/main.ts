@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   const configService = app.get<ConfigService>(ConfigService);
-  const PORT = configService.get('PORT');
+  const PORT = process.env.PORT || configService.get('PORT');
   console.log('Running on port ' + PORT);
 
   const config = new DocumentBuilder()
