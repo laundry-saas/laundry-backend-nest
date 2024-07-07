@@ -1,6 +1,14 @@
 version: '3.0'
 
 services:
+  dynamodb:
+    image: 'amazon/dynamodb-local'
+    ports:
+      - ${DYNAMODB_PORT}:${DYNAMODB_PORT}
+    volumes:
+      - ~/dynamodb-data:/data
+    env_file: .env
+
   database:
     image: 'postgres:latest'
     ports:
