@@ -40,7 +40,7 @@ export class CreateOrderDto {
   @ApiProperty()
   @IsUUID()
   @IsOptional()
-  customerId: string;
+  customerId?: string;
 
   @ApiProperty()
   @IsUUID()
