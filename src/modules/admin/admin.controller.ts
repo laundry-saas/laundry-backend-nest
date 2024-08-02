@@ -1,42 +1,99 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
-  Delete,
+  Query,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
+import { CustomerService } from '../customer/customer.service';
+import { OrderService } from '../order/order.service';
+import { TransactionService } from '../transaction/transaction.service';
+import { CustomerQueryDto } from '../customer/dto/customer-query.dto';
+import { OrderQueryDto } from '../order/dto/order-query.dto';
+import { UpdateOrderStatus } from '../order/dto/update-order-status.dto';
+import { UpdateLaundryStatus } from '../order/dto/update-laundry-status.dto';
+import { TransactionQueryDto } from '../transaction/dto/transaction-query.dto';
 
+@ApiTags('Admin')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly customerService: CustomerService,
+    private readonly orderService: OrderService,
+    private readonly transactionService: TransactionService,
+  ) {}
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
+  @Get('dashboard/stat')
+  async getDashboardStat() {
+    const customers = await this.customerService.getCount();
+    const completedOrders = await this.orderService.getCompletedOrdersCount();
+    const totalOrders = await this.orderService.getTotalOrdersCount();
+    const totalSales = await this.transactionService.getTotalSalesCount();
+    return {
+      customers,
+      completedOrders,
+      totalOrders,
+      totalSales,
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
+  @Get('customers')
+  getAllCustomers(@Query() query: CustomerQueryDto) {
+    console.log('query', query);
+    return this.customerService.findAll({
+      page: +query.page,
+      pageSize: +query.pageSize,
+      search: query.search,
+      sort: query.sort,
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adminService.findOne(+id);
+  @Get('orders')
+  @ApiOperation({ summary: 'get all created orders' })
+  async getAllOrders(@Query() query: OrderQueryDto) {
+    const orders = await this.orderService.getAllOrders(query);
+    return orders;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  @Patch('orders/:orderId/status')
+  @ApiOperation({ summary: 'update order status' })
+  async updateOrderStatus(
+    @Param('orderId') orderId: string,
+    @Body() body: UpdateOrderStatus,
+  ) {
+    await this.orderService.findOrderByIdOrThrow(orderId);
+    return this.orderService.updateOrderStatus(orderId, body);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adminService.remove(+id);
+  @Patch('orders/:orderId/laundry-status')
+  @ApiOperation({ summary: 'update laundry ] status' })
+  async updateLaundryStatus(
+    @Param('orderId') orderId: string,
+    @Body() body: UpdateLaundryStatus,
+  ) {
+    await this.orderService.findOrderByIdOrThrow(orderId);
+    return this.orderService.updateLaundryStatus(orderId, body);
+  }
+
+  @Get('transactions')
+  @ApiOperation({ summary: 'get all transactions' })
+  async getAllTransactions(
+    @Res() res: Response,
+    @Query() query: TransactionQueryDto,
+  ) {
+    const result = await this.transactionService.getAllTransactions({
+      page: query.page,
+      pageSize: query.pageSize,
+      search: query.search,
+      sort: query.sort,
+    });
+    return result;
   }
 }

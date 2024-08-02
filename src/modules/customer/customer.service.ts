@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from 'src/libs/prisma/prisma.client';
+import { SortOrder } from 'src/libs/commons/enums/sort-order';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CustomerService {
@@ -17,6 +19,10 @@ export class CustomerService {
         userId: payload.userId,
       },
     });
+  }
+
+  getCount() {
+    return this.prisma.customer.count();
   }
 
   async findCustomerByUserIdOrThrow(userId: string) {
@@ -45,12 +51,51 @@ export class CustomerService {
     });
   }
 
-  findAll(page: number = 1, pageSize: number = 20) {
+  async findAll({
+    page = 1,
+    pageSize = 10,
+    sort = SortOrder.DESC,
+    search,
+  }: {
+    page: number;
+    pageSize: number;
+    sort?: SortOrder;
+    search?: string;
+  }) {
+    let filterWhere: Prisma.CustomerWhereInput = {};
+    if (search) {
+      //TODO: @me FIX THE SEEARCH
+      filterWhere = {
+        // firstName: { startsWith: search, mode: 'insensitive' },
+        // lastName: { startsWith: search, mode: 'insensitive' },
+        user: {
+          email: { startsWith: search, mode: 'insensitive' },
+          // phoneNumber: { startsWith: search, mode: 'insensitive' },
+        },
+      };
+    }
+
     const offset = (page - 1) * pageSize;
-    return this.prisma.customer.findMany({
-      take: pageSize,
+    const data = await this.prisma.customer.findMany({
+      where: filterWhere,
       skip: offset,
+      take: pageSize,
+      include: { user: true },
+      orderBy: { createdAt: sort },
     });
+
+    const totalCount = await this.prisma.customer.count({
+      where: filterWhere,
+    });
+
+    return {
+      data,
+      pagination: {
+        page,
+        pageSize,
+        totalCount,
+      },
+    };
   }
 
   findOne(id: string) {
