@@ -10,10 +10,12 @@ import { OrderModule } from './modules/order/order.module';
 // import { ReviewModule } from './modules/review/review.module';
 // import { NotificationModule } from './modules/notification/notification.module';
 import { PriceListModule } from './modules/price-list/price-list.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    AdminModule,
     AuthModule,
     UserModule,
     // CustomerModule,
