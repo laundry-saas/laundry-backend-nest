@@ -13,7 +13,6 @@ export class CustomerService {
     return this.prisma.customer.create({
       data: {
         name: payload.name,
-        email: payload.email,
         phone: payload.phone,
         vendorId: payload.vendorId,
         userId: payload.userId,

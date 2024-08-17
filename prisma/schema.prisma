@@ -77,7 +77,7 @@ model Location {
 model User {
   id            String         @id @default(uuid())
   phone         String
-  email         String
+  email         String?
   password      String
   role          UserRole
   customer      Customer?
@@ -122,10 +122,9 @@ model Vendor {
 }
 
 model Customer {
-  id    String @id @default(uuid())
+  id    String  @id @default(uuid())
   name  String
-  email String @unique
-  phone String @unique
+  phone String  @unique
 
   vendor       Vendor        @relation(fields: [vendorId], references: [id])
   vendorId     String
@@ -141,15 +140,15 @@ model Customer {
 }
 
 model PriceList {
-  id          String      @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   price       Float
   description String?
   imageUrl    String?
-  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
   vendorId    String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("price_list")
 }
@@ -181,13 +180,13 @@ model Order {
 }
 
 model OrderItem {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   itemId    String
   quantity  Int
-  order     Order     @relation(fields: [orderId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("order_items")
 }

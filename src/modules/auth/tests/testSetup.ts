@@ -15,7 +15,7 @@ export const generateSampleUserPayload = (overrides?: Partial<User>) => {
   } as User;
 };
 
-export const generateSampleUser = (overrides?: Partial<User>) => {
+export const generateSampleUser = async (overrides?: Partial<User>) => {
   const payload = generateSampleUserPayload(overrides);
   return prisma.user.create({ data: payload });
 };

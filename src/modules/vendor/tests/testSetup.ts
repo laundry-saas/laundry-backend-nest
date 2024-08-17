@@ -16,7 +16,9 @@ export const generateSampleVendorPayload = (
   } as VendorEntity;
 };
 
-export const generateSampleVendor = (overrides?: Partial<VendorEntity>) => {
+export const generateSampleVendor = async (
+  overrides?: Partial<VendorEntity>,
+) => {
   const payload = generateSampleVendorPayload(overrides);
   return prisma.vendor.create({ data: payload });
 };

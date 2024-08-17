@@ -7,8 +7,6 @@ export class CustomerEntity implements Customer {
   @ApiProperty()
   name: string;
   @ApiProperty()
-  email: string;
-  @ApiProperty()
   phone: string;
   @ApiProperty()
   vendorId: string;

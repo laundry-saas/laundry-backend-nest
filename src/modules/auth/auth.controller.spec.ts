@@ -22,7 +22,9 @@ import { LoginDto } from './dto/login.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import * as argon from 'argon2';
 
-const prisma = new PrismaService();
+const prisma = new PrismaService({
+  log: ['query', 'info', 'warn', 'error'],
+});
 
 describe('AuthController', () => {
   let app: INestApplication = null;
@@ -67,18 +69,18 @@ describe('AuthController', () => {
     });
   });
 
-  describe('POST /auth/register/customer', () => {
+  describe.only('POST /auth/register/customer', () => {
     beforeEach(async () => {
       await generateSampleUser({ id: userId });
       await generateSampleVendor({ id: vendorId, userId });
     });
     afterEach(async () => {
-      await prisma.order.deleteMany();
-      await prisma.customer.deleteMany();
-      await prisma.vendor.delete({
-        where: { id: vendorId },
-      });
-      await prisma.user.delete({ where: { id: userId } });
+      // await prisma.order.deleteMany();
+      // await prisma.customer.deleteMany();
+      // await prisma.vendor.delete({
+      //   where: { id: vendorId },
+      // });
+      // await prisma.user.delete({ where: { id: userId } });
     });
     const request = async (payload: CreateCustomerAuthDto) =>
       await builtHttpRequest(app.getHttpServer())
@@ -89,6 +91,19 @@ describe('AuthController', () => {
       const payload = {
         name: faker.person.fullName(),
         email: faker.internet.email(),
+        password: 'password123',
+        phone: faker.phone.number(),
+        role: 'CUSTOMER',
+        vendorId,
+      } as CreateCustomerAuthDto;
+      const { status, body } = await request(payload);
+      expect(status).toEqual(201);
+      expect(body).toHaveProperty('access_token');
+    });
+    it('can register a customer with no email', async () => {
+      const payload = {
+        name: faker.person.fullName(),
+        email: null,
         password: 'password123',
         phone: faker.phone.number(),
         role: 'CUSTOMER',

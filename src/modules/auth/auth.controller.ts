@@ -24,7 +24,7 @@ export class AuthController {
   @Post('register/customer')
   async registerCustomer(@Body() createCustomerDto: CreateCustomerAuthDto) {
     const { email, phone, password, name, vendorId } = createCustomerDto;
-    await this.userService.validateUserEmailExists(email);
+    await this.userService.validateUserPhoneExists(phone);
     const createdUser = await this.userService.create({
       phone,
       email,
